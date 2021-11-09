@@ -1,0 +1,15 @@
+{
+"actuator_gpio_map": {
+                   "heat_relay": 14,
+                   "humidifier_relay": 15,
+                   "fan_relay": 18,
+                   "light_relay": 23,
+                   "water_relay": 24,
+                   "air_relay": 25
+                   },
+"button_gpio_map": {
+                 "start_stop_button": 17,
+                 "connect_internet_button": 27,
+                 "run_water_button": 22
+                 }
+}
