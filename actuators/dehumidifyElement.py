@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------------------------
-#Manages Hardware for Humidity
+#Manages Hardware for Dehumidifier
 #TODO:
 #	(possible) define one function to handle various behavior
 #---------------------------------------------------------------------------------------
@@ -9,7 +9,7 @@ import os.path
 import sys
 
 #set proper path for modules
-sys.path.append('/home/pi/oasis-grow')
+sys.path.append('/home/pi/oasis-hive')
 sys.path.append('/usr/lib/python37.zip')
 sys.path.append('/usr/lib/python3.7')
 sys.path.append('/usr/lib/python3.7/lib-dynload')
@@ -22,12 +22,12 @@ import time
 import json
 
 #get hardware config
-with open('/home/pi/oasis-grow/configs/hardware_config.json') as h:
+with open('/home/pi/oasis-hive/configs/hardware_config.json') as h:
   hardware_config = json.load(h)
 
 #setup GPIO
 GPIO.setmode(GPIO.BCM) #GPIO Numbers instead of board numbers
-Hum_GPIO = hardware_config["actuator_gpio_map"]["humidifier_relay"] #heater pin pulls from config file
+Hum_GPIO = hardware_config["actuator_gpio_map"]["dehumidifier_relay"] #heater pin pulls from config file
 GPIO.setup(Hum_GPIO, GPIO.OUT) #GPIO setup
 GPIO.output(Hum_GPIO, GPIO.LOW) #relay open = GPIO.HIGH, closed = GPIO.LOW
 

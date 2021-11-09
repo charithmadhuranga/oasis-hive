@@ -8,7 +8,7 @@ from subprocess import Popen
 import reset_model
 
 #set proper path for modules
-sys.path.append('/home/pi/oasis-grow')
+sys.path.append('/home/pi/oasis-hive')
 sys.path.append('/usr/lib/python37.zip')
 sys.path.append('/usr/lib/python3.7')
 sys.path.append('/usr/lib/python3.7/lib-dynload')
@@ -18,29 +18,29 @@ sys.path.append('/usr/lib/python3/dist-packages')
 
 #declare state variables
 device_state = None #describes the current state of the system
-grow_params = None #describes the grow configuration of the system
+hive_params = None #describes the grow configuration of the system
 hardware_config = None #holds hardware I/O setting & pin #s
 access_config = None #contains credentials for connecting to firebase
 feature_toggles = None #tells the system which features are in use
 
 def load_state(loop_limit=100000): #Depends on: 'json'; Modifies: device_state,hardware_config ,access_config
-    global device_state, feature_toggles, access_config, grow_params, hardware config
+    global device_state, feature_toggles, access_config, hive_params, hardware config
 
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/device_state.json") as d:
+            with open("/home/pi/oasis-hive/configs/device_state.json") as d:
                 device_state = json.load(d) #get device state    
                 
-            with open("/home/pi/oasis-grow/configs/grow_params.json") as g:
-                grow_params = json.load(g) #get grow params   
+            with open("/home/pi/oasis-hive/configs/hive_params.json") as g:
+                hive_params = json.load(g) #get grow params   
                 
-            with open("/home/pi/oasis-grow/configs/access_config.json") as a:
+            with open("/home/pi/oasis-hive/configs/access_config.json") as a:
                 access_config = json.load(a) #get access state
                 
-            with open ("/home/pi/oasis-grow/configs/feature_toggles.json") as f:
+            with open ("/home/pi/oasis-hive/configs/feature_toggles.json") as f:
                 feature_toggles = json.load(f) #get feature toggles
         
-            with open ("/home/pi/oasis-grow/configs/hardware_config.json") as h:
+            with open ("/home/pi/oasis-hive/configs/hardware_config.json") as h:
                 hardware_config = json.load(h) #get hardware config
         
             break
@@ -65,7 +65,7 @@ def write_state(path,field,value, loop_limit=100000): #Depends on: load_state(),
             with open(path, "r+") as x: # open the file.
                 data = json.load(x) # can we load a valid json?
               
-                if path == "/home/pi/oasis-grow/configs/device_state.json": #are we working in device_state?
+                if path == "/home/pi/oasis-hive/configs/device_state.json": #are we working in device_state?
                     if data["device_state_write_available"] == "1": #check is the file is available to be written
                         data["device_state_write_available"] = "0" #let system know resource is not available
                         x.seek(0)
@@ -83,14 +83,14 @@ def write_state(path,field,value, loop_limit=100000): #Depends on: load_state(),
                     else:
                         pass                    
    
-                elif path == "/home/pi/oasis-grow/configs/grow_params.json": #are we working in grow_params?
-                    if data["grow_params_write_available"] == "1":
-                        data["grow_params_write_available"] = "0" #let system know writer is not available
+                elif path == "/home/pi/oasis-hive/configs/hive_params.json": #are we working in hive_params?
+                    if data["hive_params_write_available"] == "1":
+                        data["hive_params_write_available"] = "0" #let system know writer is not available
                         x.seek(0)
                         json.dump(data, x)
                         x.truncate()
 
-                        data["grow_params_write_available"] = "1"
+                        data["hive_params_write_available"] = "1"
                         data[field] = value #write the desired value
                         x.seek(0)
                         json.dump(data, x)
@@ -120,16 +120,16 @@ def git_pull():
 
 #save existing data into temps
 def save_old_configs():
-    savehardware = Popen(["cp", "/home/pi/oasis-grow/configs/hardware_config.json", "/home/pi/oasis-grow/configs/hardware_config_temp.json"])
+    savehardware = Popen(["cp", "/home/pi/oasis-hive/configs/hardware_config.json", "/home/pi/oasis-hive/configs/hardware_config_temp.json"])
     savehardware.wait()
 
-    saveaccess = Popen(["cp", "/home/pi/oasis-grow/configs/access_config.json", "/home/pi/oasis-grow/configs/access_config_temp.json"])
+    saveaccess = Popen(["cp", "/home/pi/oasis-hive/configs/access_config.json", "/home/pi/oasis-hive/configs/access_config_temp.json"])
     saveaccess.wait()
 
-    savestate = Popen(["cp", "/home/pi/oasis-grow/configs/device_state.json", "/home/pi/oasis-grow/configs/device_state_temp.json"])
+    savestate = Popen(["cp", "/home/pi/oasis-hive/configs/device_state.json", "/home/pi/oasis-hive/configs/device_state_temp.json"])
     savestate.wait()
 
-    saveparams = Popen(["cp", "/home/pi/oasis-grow/configs/grow_params.json", "/home/pi/oasis-grow/configs/grow_params_temp.json"])
+    saveparams = Popen(["cp", "/home/pi/oasis-hive/configs/hive_params.json", "/home/pi/oasis-hive/configs/hive_params_temp.json"])
     saveparams.wait()
 
     print("Saved existing configs to temporary files")
@@ -168,21 +168,21 @@ if __name__ == '__main__':
     #back up the configs & state that can survive update
     save_old_configs()
     reset_model.reset_all()
-    transfer_compatible_configs('/home/pi/oasis-grow/configs/hardware_config.json', '/home/pi/oasis-grow/configs/hardware_config_temp.json')
-    transfer_compatible_configs('/home/pi/oasis-grow/configs/access_config.json', '/home/pi/oasis-grow/configs/access_config_temp.json')
-    transfer_compatible_configs('/home/pi/oasis-grow/configs/device_state.json', '/home/pi/oasis-grow/configs/device_state_temp.json')
-    transfer_compatible_configs('/home/pi/oasis-grow/configs/grow_params.json', '/home/pi/oasis-grow/configs/grow_params_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/hardware_config.json', '/home/pi/oasis-hive/configs/hardware_config_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/access_config.json', '/home/pi/oasis-hive/configs/access_config_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/device_state.json', '/home/pi/oasis-hive/configs/device_state_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/hive_params.json', '/home/pi/oasis-hive/configs/hive_params_temp.json')
     print("Transfered compatible state & configs, removing temporary files")
 
     #run external update commands
-    update_commands = Popen(["sudo", "python3", "/home/pi/oasis-grow/utils/update_commands.py"])
+    update_commands = Popen(["sudo", "python3", "/home/pi/oasis-hive/utils/update_commands.py"])
     output, error = update_commands.communicate()
 
     #load state to get configs & state for conn
     load_state()
 
     #change awaiting_update to "O" in firebase and locally
-    write_state("/home/pi/oasis-grow/configs/device_state.json", "awaiting_update", "0")
+    write_state("/home/pi/oasis-hive/configs/device_state.json", "awaiting_update", "0")
 
     #reboot
     print("Rebooting...")

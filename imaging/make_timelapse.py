@@ -10,8 +10,8 @@ import os.path
 import sys
 
 #set proper path for modules
-sys.path.append('/home/pi/oasis-grow')
-sys.path.append('/home/pi/oasis-grow/utils')
+sys.path.append('/home/pi/oasis-hive')
+sys.path.append('/home/pi/oasis-hive/utils')
 sys.path.append('/usr/lib/python37.zip')
 sys.path.append('/usr/lib/python3.7')
 sys.path.append('/usr/lib/python3.7/lib-dynload')
@@ -28,11 +28,11 @@ import reset_model
 readable = datetime.datetime.fromtimestamp(time.time()).isoformat()
 
 #dir where images are stored
-image_folder = '/home/pi/oasis-grow/data_out/image_feed'
+image_folder = '/home/pi/oasis-hive/data_out/image_feed'
 
 #name of output timelapse
 #.avi = audio visual imput, not being conceited this time ;)
-video_name = '/home/pi/oasis-grow/data_out/'+ str(readable) + '_timelapse.avi'
+video_name = '/home/pi/oasis-hive/data_out/'+ str(readable) + '_timelapse.avi'
 
 #loops throught the directory to get file names
 images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]

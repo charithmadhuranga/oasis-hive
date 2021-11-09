@@ -1,8 +1,8 @@
-# oasis-grow
+# oasis-hive
 
 ## Introduction
 
-oasis-grow, developed by Oasis-X, is an open-source toolkit for controlled environment cultivation, remote monitoring, and data collection. It is maintained with the goal of making the capabilities of automated gardening, precision agriculture, and cell culturing available to everyone. Users are encouraged to contribute data, projects, and technical expertise. See [Contributing](#contributing) for details.
+oasis-hive, developed by Oasis-X, is an open-source toolkit for controlled environment cultivation, remote monitoring, and data collection. It is maintained with the goal of making the capabilities of automated gardening, precision agriculture, and cell culturing available to everyone. Users are encouraged to contribute data, projects, and technical expertise. See [Contributing](#contributing) for details.
 
 This repository contains:
 1. Python scripts for monitoring the grow environment and interfacing with peripherals sensors and devices,
@@ -28,12 +28,12 @@ All functions can be deployed with a RaspberryPi (for networking, scheduling, ta
   - [Contributing](#contributing)
 
 ## Raspberry Pi Setup
-Users have two options for install: using a pre-built image to flash oasis-grow and its requisite packages directly to an SD card, or using the [setup scripts](scripts) to build the repository and its requirements onto a fresh install of Raspbian Lite.
+Users have two options for install: using a pre-built image to flash oasis-hive and its requisite packages directly to an SD card, or using the [setup scripts](scripts) to build the repository and its requirements onto a fresh install of Raspbian Lite.
 
 ### Using pre-built image
 
 Install the image onto your Raspberry Pi:
-1. Download the oasis-grow image here: [NOT YET AVAILABLE].
+1. Download the oasis-hive image here: [NOT YET AVAILABLE].
 2. Download [Balena Etcher](https://www.balena.io/etcher/).
 3. Connect a microSD card to your personal computer.
 4. Format the microSD card in the MS-DOS (FAT) style using your operating system's disk formatting utility.
@@ -67,14 +67,14 @@ Next, install git:
 ```
 sudo apt-get install -y git
 ```
-Use git to clone the oasis-grow repository into `/home/pi`:
+Use git to clone the oasis-hive repository into `/home/pi`:
 ```
 cd ~
-sudo git clone https://github.com/oasis-gardens/oasis-grow
+sudo git clone https://github.com/oasis-gardens/oasis-hive
 ```
 Change permissions and run the `master_setup.sh` script found in the repository's root directory. If you wish to run `controller.py` automatically at startup, at the `-b` flag.
 ```
-cd oasis-grow
+cd oasis-hive
 chmod +x install.sh
 source ./install.sh -b    #-b flag starts the bootloader, causing the interface to launch on startup in the background.
 ```
@@ -118,7 +118,7 @@ If you have followed the DIY wiring guide, the three buttons on the control inte
 
 ### Using the Button Interface
 
-To use the platform with the [button interface](#button-interface) and OASIS app, follow the instructions immediately below. If you wish to run oasis-grow from the command line, skip to the **Using the Command Line** header. Begin by opening a terminal on the Raspberry Pi and opening `/etc/rc.local`:
+To use the platform with the [button interface](#button-interface) and OASIS app, follow the instructions immediately below. If you wish to run oasis-hive from the command line, skip to the **Using the Command Line** header. Begin by opening a terminal on the Raspberry Pi and opening `/etc/rc.local`:
 ```
 sudo nano /etc/rc.local
 ```
@@ -138,7 +138,7 @@ Once `controller.py` is running, and if wiring has been [set up correctly](#diy-
 
 **Using the Command Line**
 
-oasis-grow can be run directly from the command line. This is the ideal option for those who would like to use custom interfaces and integrate their own scripts + programming (we are accepting collaborators, contributions, & pull requests! Hit us up mike@oasisregenerative.com, or see [Contributing](#contributing)). In order to do this, please obtain the required hardware running grow-ctrl as a pre-flashed image (contact us) or built from source (see below).
+oasis-hive can be run directly from the command line. This is the ideal option for those who would like to use custom interfaces and integrate their own scripts + programming (we are accepting collaborators, contributions, & pull requests! Hit us up mike@oasisregenerative.com, or see [Contributing](#contributing)). In order to do this, please obtain the required hardware running grow-ctrl as a pre-flashed image (contact us) or built from source (see below).
 
 Start by opening a terminal and run the following command to enter the project directory:
 ```
@@ -146,7 +146,7 @@ cd ~/grow-ctrl
 ```
 Running the following command to start a grow cycle with default settings. This begins the process of sensing temperature, humidity, & water level, regulating heat, humidity, airflow, light, & water, and capturing images at regular intervals.
 ```
-python3 grow_ctrl.py main
+python3 hive_ctrl.py main
 ```
 To make use of the [button interface](#button-interface) for controlling the grow cycles, use this instead:
 ```
@@ -162,11 +162,11 @@ python3 /home/pi/grow-ctrl/controller.py
 ```
 Remove the leading hashtag if there is one. If you do not see this line, add the command to `/etc/rc.local` before the `exit 0` command.
 
-Two configuration files, `grow_params.json` and `feature_toggles.json`, can be edited directly from the command line using a text editor like `nano`. More details can be found under [Configuration](#configuration).
+Two configuration files, `hive_params.json` and `feature_toggles.json`, can be edited directly from the command line using a text editor like `nano`. More details can be found under [Configuration](#configuration).
 
 ## Configuration
 
-oasis-grow contains two important configuration files, both located in the repository's root directory. 
+oasis-hive contains two important configuration files, both located in the repository's root directory. 
 
 `feature_toggles.json` toggles certain features on and off:
 | Field | Value | Function |
@@ -182,7 +182,7 @@ oasis-grow contains two important configuration files, both located in the repos
 | `save_images` | `0` or `1` | determines whether the camera is saving images to a continuous feed that can be used to generate timelapses |
 | `save_data` | `0` or `1` | determines whether the grow control process is logging sensor data to a `.csv` file
 
-`grow_params.json` modifies grow parameters:
+`hive_params.json` modifies grow parameters:
 | Field | Value | Function |
 | ----- | ----- | -------- |
 | `targetT` | int 0 to 100 | sets target temperature |
@@ -205,7 +205,7 @@ oasis-grow contains two important configuration files, both located in the repos
 | `Dh_fan` | int | dampening feedback response for fan with respect to humidity (advanced)
 
 ## Sample Projects
-oasis-grow provides a highly modular interface with countless possible applications. A forthcoming wiki will provide detailed instructions for common projects as well as a gallery of existing OASIS applications:
+oasis-hive provides a highly modular interface with countless possible applications. A forthcoming wiki will provide detailed instructions for common projects as well as a gallery of existing OASIS applications:
 - time lapse cameras
 - incubators
 - mushroom growing chambers
@@ -216,7 +216,7 @@ oasis-grow provides a highly modular interface with countless possible applicati
 - much more!
 
 ## Contributing
-oasis-grow welcomes open-source contributors and is currently accepting pull requests. Contact mike@oasisregenerative.com with questions or proposals.
+oasis-hive welcomes open-source contributors and is currently accepting pull requests. Contact mike@oasisregenerative.com with questions or proposals.
 
 A wiki with additional information on building from source and the makeup of the core python scripts is in the works.
 

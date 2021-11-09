@@ -5,8 +5,8 @@ import sys
 from subprocess import Popen
 
 #set proper path for modules
-sys.path.append('/home/pi/oasis-grow')
-sys.path.append('/home/pi/oasis-grow/utils')
+sys.path.append('/home/pi/oasis-hive')
+sys.path.append('/home/pi/oasis-hive/utils')
 sys.path.append('/usr/lib/python37.zip')
 sys.path.append('/usr/lib/python3.7')
 sys.path.append('/usr/lib/python3.7/lib-dynload')
@@ -27,7 +27,7 @@ import streamlit as st
 
 #declare state variables
 device_state = None #describes the current state of the system
-grow_params = None #describes the grow configuration of the system
+hive_params = None #describes the grow configuration of the system
 hardware_config = None #holds hardware I/O setting & pin #s
 access_config = None #contains credentials for connecting to firebase
 feature_toggles = None #tells the system which features are in use
@@ -36,12 +36,12 @@ feature_toggles = None #tells the system which features are in use
 locks = None
 
 def load_state(loop_limit=100000): #Depends on: 'json'; Modifies: device_state,hardware_config ,access_config
-    global device_state, grow_params, access_config, feature_toggles, hardware_config
+    global device_state, hive_params, access_config, feature_toggles, hardware_config
 
     #load device state
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/device_state.json") as d:
+            with open("/home/pi/oasis-hive/configs/device_state.json") as d:
                 device_state = json.load(d) #get device state
 
             for k,v in device_state.items(): 
@@ -62,17 +62,17 @@ def load_state(loop_limit=100000): #Depends on: 'json'; Modifies: device_state,h
                 print("Main.py tried to read while file was being written. If this continues, file is corrupted.")
                 pass
     
-    #load grow_params
+    #load hive_params
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/grow_params.json") as g:
-                grow_params = json.load(g) #get device state
+            with open("/home/pi/oasis-hive/configs/hive_params.json") as g:
+                hive_params = json.load(g) #get device state
 
-            for k,v in grow_params.items(): 
-                if grow_params[k] is None:
-                    print("Read NoneType in grow_params")
-                    print("Resetting grow_params...")
-                    reset_model.reset_grow_params()
+            for k,v in hive_params.items(): 
+                if hive_params[k] is None:
+                    print("Read NoneType in hive_params")
+                    print("Resetting hive_params...")
+                    reset_model.reset_hive_params()
                      
                 else: 
                     pass    
@@ -81,16 +81,16 @@ def load_state(loop_limit=100000): #Depends on: 'json'; Modifies: device_state,h
             
         except Exception as e:
             if i == int(loop_limit):
-                print("Main.py tried to read max # of times. File is corrupted. Resetting grow_params...")
-                reset_model.reset_grow_params()
+                print("Main.py tried to read max # of times. File is corrupted. Resetting hive_params...")
+                reset_model.reset_hive_params()
             else:
-                print("Main.py tried to read while grow_params was being written. If this continues, file is corrupted.")
+                print("Main.py tried to read while hive_params was being written. If this continues, file is corrupted.")
                 pass   
 
     #load access_config
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/access_config.json") as a:
+            with open("/home/pi/oasis-hive/configs/access_config.json") as a:
                 access_config = json.load(a) #get device state
 
             for k,v in access_config.items(): 
@@ -115,7 +115,7 @@ def load_state(loop_limit=100000): #Depends on: 'json'; Modifies: device_state,h
     #load feature_toggles
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/feature_toggles.json") as f:
+            with open("/home/pi/oasis-hive/configs/feature_toggles.json") as f:
                 feature_toggles = json.load(f) #get device state
 
             for k,v in feature_toggles.items(): 
@@ -140,7 +140,7 @@ def load_state(loop_limit=100000): #Depends on: 'json'; Modifies: device_state,h
     #load hardware_config
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/hardware_config.json") as h:
+            with open("/home/pi/oasis-hive/configs/hardware_config.json") as h:
                 hardware_config = json.load(h) #get device state
 
             for k,v in hardware_config.items(): 
@@ -166,7 +166,7 @@ def load_locks(loop_limit = 10000):
     global locks
     for i in list(range(int(loop_limit))): #try to load, check if available, make unavailable if so, write state if so, write availabke iff so,  
         try:
-            with open("/home/pi/oasis-grow/configs/locks.json","r+") as l:
+            with open("/home/pi/oasis-hive/configs/locks.json","r+") as l:
                 locks = json.load(l) #get locks
 
             for k,v in locks.items():
@@ -190,7 +190,7 @@ def load_locks(loop_limit = 10000):
 def lock(file):
     global locks
     
-    with open("/home/pi/oasis-grow/configs/locks.json", "r+") as l:
+    with open("/home/pi/oasis-hive/configs/locks.json", "r+") as l:
         locks = json.load(l) #get lock
         
         if file == "device_state":
@@ -199,8 +199,8 @@ def lock(file):
             json.dump(locks, l)
             l.truncate()
                 
-        if file == "grow_params":
-            locks["grow_params_write_available"] = "0" #let system know resource is not available
+        if file == "hive_params":
+            locks["hive_params_write_available"] = "0" #let system know resource is not available
             l.seek(0)
             json.dump(locks, l)
             l.truncate()
@@ -226,7 +226,7 @@ def lock(file):
 def unlock(file):
     global locks
     
-    with open("/home/pi/oasis-grow/configs/locks.json", "r+") as l:
+    with open("/home/pi/oasis-hive/configs/locks.json", "r+") as l:
         locks = json.load(l) #get lock
         
         if file == "device_state":
@@ -235,8 +235,8 @@ def unlock(file):
             json.dump(locks, l)
             l.truncate()
                 
-        if file == "grow_params":
-            locks["grow_params_write_available"] = "1" #let system know resource is not available
+        if file == "hive_params":
+            locks["hive_params_write_available"] = "1" #let system know resource is not available
             l.seek(0)
             json.dump(locks, l)
             l.truncate()
@@ -278,7 +278,7 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
             with open(path, "r+") as x: # open the file.
                 data = json.load(x) # can we load a valid json?
 
-                if path == "/home/pi/oasis-grow/configs/device_state.json": #are we working in device_state?
+                if path == "/home/pi/oasis-hive/configs/device_state.json": #are we working in device_state?
                     if locks["device_state_write_available"] == "1": #check is the file is available to be written
                         lock("device_state")
 
@@ -295,16 +295,16 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
                     else:
                         pass
                     
-                if path == "/home/pi/oasis-grow/configs/grow_params.json": #are we working in device_state?
-                    if locks["grow_params_write_available"] == "1": #check is the file is available to be written
-                        lock("grow_params")
+                if path == "/home/pi/oasis-hive/configs/hive_params.json": #are we working in device_state?
+                    if locks["hive_params_write_available"] == "1": #check is the file is available to be written
+                        lock("hive_params")
 
                         data[field] = value #write the desired value
                         x.seek(0)
                         json.dump(data, x)
                         x.truncate()
             
-                        unlock("grow_params")
+                        unlock("hive_params")
                         
                         load_state()
                         break #break the loop when the write has been successful
@@ -312,7 +312,7 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
                     else:
                         pass
                     
-                if path == "/home/pi/oasis-grow/configs/access_config.json": #are we working in device_state?
+                if path == "/home/pi/oasis-hive/configs/access_config.json": #are we working in device_state?
                     if locks["access_config_write_available"] == "1": #check is the file is available to be written
                         lock("access_config")
 
@@ -329,7 +329,7 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
                     else:
                         pass
                     
-                if path == "/home/pi/oasis-grow/configs/feature_toggles.json": #are we working in device_state?
+                if path == "/home/pi/oasis-hive/configs/feature_toggles.json": #are we working in device_state?
                     if locks["feature_toggles_write_available"] == "1": #check is the file is available to be written
                         lock("feature_toggles")
 
@@ -346,7 +346,7 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
                     else:
                         pass
                     
-                if path == "/home/pi/oasis-grow/configs/hardware_config.json": #are we working in device_state?
+                if path == "/home/pi/oasis-hive/configs/hardware_config.json": #are we working in device_state?
                     if locks["hardware_config_write_available"] == "1": #check is the file is available to be written
                         lock("hardware_config")
 
@@ -408,7 +408,7 @@ def modAccessConfig(name, e, p):
     access_config["id_token"] = " "
     access_config["local_id"] = " "
 
-    with open("/home/pi/oasis-grow/configs/access_config.json", "r+") as a:
+    with open("/home/pi/oasis-hive/configs/access_config.json", "r+") as a:
         a.seek(0)
         json.dump(access_config, a)
         a.truncate()
@@ -416,7 +416,7 @@ def modAccessConfig(name, e, p):
     print("Access configs added")
 
 def enable_WiFi(): #Depends on: 'subprocess'; Modifies: None
-    write_state("/home/pi/oasis-grow/configs/device_state.json","access_point","0")
+    write_state("/home/pi/oasis-hive/configs/device_state.json","access_point","0")
 
     config_wifi_dchpcd = Popen("sudo cp /etc/dhcpcd_WiFi.conf /etc/dhcpcd.conf", shell = True)
     config_wifi_dchpcd.wait()
@@ -442,7 +442,7 @@ def save_creds_exit(email, password, wifi_name, wifi_pass, device_name):
     reset_model.reset_device_state()
 
     #set new_device to "0" before rebooting
-    write_state("/home/pi/oasis-grow/configs/device_state.json", "new_device", "1")
+    write_state("/home/pi/oasis-hive/configs/device_state.json", "new_device", "1")
 
     #stand up wifi and reboot
     enable_WiFi()

@@ -10,7 +10,7 @@ import os.path
 import sys
 
 #set proper path for modules
-sys.path.append('/home/pi/oasis-grow')
+sys.path.append('/home/pi/oasis-hive')
 sys.path.append('/usr/lib/python37.zip')
 sys.path.append('/usr/lib/python3.7')
 sys.path.append('/usr/lib/python3.7/lib-dynload')
@@ -23,7 +23,7 @@ import time
 import json
 
 #get hardware config
-with open('/home/pi/oasis-grow/configs/hardware_config.json') as h:
+with open('/home/pi/oasis-hive/configs/hardware_config.json') as h:
   hardware_config = json.load(h)
 
 #setup GPIO

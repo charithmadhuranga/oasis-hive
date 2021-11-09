@@ -4,7 +4,7 @@ from subprocess import Popen
 import json
 
 #set proper path for modules
-sys.path.append('/home/pi/oasis-grow')
+sys.path.append('/home/pi/oasis-hive')
 sys.path.append('/usr/lib/python37.zip')
 sys.path.append('/usr/lib/python3.7')
 sys.path.append('/usr/lib/python3.7/lib-dynload')
@@ -33,21 +33,21 @@ waterLow = 0
 
 #loads device state, hardware, and access configurations
 def load_state(): #Depends on: 'json'; Modifies: device_state,hardware_config ,access_config
-    global device_state, feature_toggles, access_config, grow_params
+    global device_state, feature_toggles, access_config, hive_params
 
-    with open("/home/pi/oasis-grow/configs/device_state.json") as d:
+    with open("/home/pi/oasis-hive/configs/device_state.json") as d:
         device_state = json.load(d)
     d.close()
 
-    with open("/home/pi/oasis-grow/configs/grow_params.json") as g:
-        grow_params = json.load(g)
+    with open("/home/pi/oasis-hive/configs/hive_params.json") as g:
+        hive_params = json.load(g)
     g.close()
 
-    with open("/home/pi/oasis-grow/configs/access_config.json") as a:
+    with open("/home/pi/oasis-hive/configs/access_config.json") as a:
         access_config = json.load(a)
     a.close()
 
-    with open ("/home/pi/oasis-grow/configs/feature_toggles.json") as f:
+    with open ("/home/pi/oasis-hive/configs/feature_toggles.json") as f:
         feature_toggles = json.load(f)
     f.close()
 
@@ -67,7 +67,7 @@ def test_serial_connections():
 
 def test_camera():
     try:
-        camera_process = Popen(['python3', '/home/pi/oasis-grow/imaging/cameraElement.py', "10"]) #If running, then skips. If idle then restarts, If no process, then fails
+        camera_process = Popen(['python3', '/home/pi/oasis-hive/imaging/cameraElement.py', "10"]) #If running, then skips. If idle then restarts, If no process, then fails
         print("Camera launched, check to ensure correct behavior")
         camera_process.wait()
     except:
@@ -75,7 +75,7 @@ def test_camera():
 
 def test_heater():
     try:
-        heat_process = Popen(['python3', '/home/pi/oasis-grow/actuators/heatingElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
+        heat_process = Popen(['python3', '/home/pi/oasis-hive/actuators/heatingElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
         print("Heat actuator launched, check to ensure correct behavior")
         heat_process.wait()
     except:
@@ -83,15 +83,15 @@ def test_heater():
 
 def test_humidifier():
     try:
-        hum_process = Popen(['python3', '/home/pi/oasis-grow/actuators/humidityElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
-        print("Humidity actuator launched, check to ensure correct behavior")
+        hum_process = Popen(['python3', '/home/pi/oasis-hive/actuators/dehumidifyElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
+        print("dehumidify actuator launched, check to ensure correct behavior")
         hum_process.wait()
     except:
-        print("Humidity actuator not triggering, there is a problem with the software")
+        print("dehumidify actuator not triggering, there is a problem with the software")
 
 def test_fan():
     try:
-        fan_process = Popen(['python3', '/home/pi/oasis-grow/actuators/fanElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
+        fan_process = Popen(['python3', '/home/pi/oasis-hive/actuators/fanElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
         print("Fan actuator launched, check to ensure correct behavior")
         fan_process.wait()
     except:
@@ -99,7 +99,7 @@ def test_fan():
 
 def test_light():
     try:
-        light_process = Popen(['python3', '/home/pi/oasis-grow/actuators/lightingElement.py', "0", "0", "10"]) #If running, then skips. If idle then restarts, If no process, then fails
+        light_process = Popen(['python3', '/home/pi/oasis-hive/actuators/lightingElement.py', "0", "0", "10"]) #If running, then skips. If idle then restarts, If no process, then fails
         print("Lighting actuator launched, check to ensure correct behavior")
         light_process.wait()
     except:
@@ -107,7 +107,7 @@ def test_light():
 
 def test_water():
     try:
-        water_process = Popen(['python3', '/home/pi/oasis-grow/actuators/wateringElement.py', "10", "0"]) #If running, then skips. If idle then restarts, If no process, then fails
+        water_process = Popen(['python3', '/home/pi/oasis-hive/actuators/wateringElement.py', "10", "0"]) #If running, then skips. If idle then restarts, If no process, then fails
         print("Water actuator launched, check to ensure correct behavior")
         water_process.wait()
     except:
@@ -115,7 +115,7 @@ def test_water():
 
 def test_air():
     try:
-        air_process = Popen(['python3', '/home/pi/oasis-grow/actuators/airElement.py', "0", "0", "10"]) #If running, then skips. If idle then restarts, If no process, then fails
+        air_process = Popen(['python3', '/home/pi/oasis-hive/actuators/airElement.py', "0", "0", "10"]) #If running, then skips. If idle then restarts, If no process, then fails
         print("Air actuator launched, check to ensure correct behavior")
         water_process.wait()
     except:

@@ -1,22 +1,22 @@
 #!/bin/sh -e
 
-sudo chmod +x /home/pi/oasis-grow/scripts/setup_env.sh
-source /home/pi/oasis-grow/scripts/setup_env.sh
-sudo chmod +x /home/pi/oasis-grow/scripts/setup_config.sh
-source /home/pi/oasis-grow/scripts/setup_config.sh
-sudo chmod +x /home/pi/oasis-grow/scripts/setup_network.sh
-source /home/pi/oasis-grow/scripts/setup_network.sh
+sudo chmod +x /home/pi/oasis-hive/scripts/setup_env.sh
+source /home/pi/oasis-hive/scripts/setup_env.sh
+sudo chmod +x /home/pi/oasis-hive/scripts/setup_config.sh
+source /home/pi/oasis-hive/scripts/setup_config.sh
+sudo chmod +x /home/pi/oasis-hive/scripts/setup_network.sh
+source /home/pi/oasis-hive/scripts/setup_network.sh
 
 while getopts ":b" opt; do
     case $opt in
         b)
             echo "Adding controller bootloader..."
-            sudo chmod +x /home/pi/oasis-grow/scripts/setup_bootloader.sh
-            source /home/pi/oasis-grow/scripts/setup_bootloader.sh
+            sudo chmod +x /home/pi/oasis-hive/scripts/setup_bootloader.sh
+            source /home/pi/oasis-hive/scripts/setup_bootloader.sh
             
             echo "Optimizing boot time..."
-            sudo chmod +x /home/pi/oasis-grow/scripts/optimize_boot.sh
-            source /home/pi/oasis-grow/scripts/optimize_boot.sh -no_bt        
+            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
+            source /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
             
             ;;
         \?)
