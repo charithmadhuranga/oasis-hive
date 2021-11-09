@@ -81,7 +81,7 @@ def test_heater():
     except:
         print("Heat actuator not triggering, there is a problem with the software")
 
-def test_humidifier():
+def test_dehumidifier():
     try:
         hum_process = Popen(['python3', '/home/pi/oasis-hive/actuators/dehumidifyElement.py', str(100)]) #If running, then skips. If idle then restarts, If no process, then fails
         print("dehumidify actuator launched, check to ensure correct behavior")
@@ -137,7 +137,7 @@ def run_all_tests():
     test_serial_connections()
     test_camera()
     test_heater()
-    test_humidifier()
+    test_dehumidifier()
     test_fan()
     test_light()
     test_water()

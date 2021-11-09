@@ -472,7 +472,7 @@ def heat_pd(temperature, target_temperature, last_temperature, last_target_tempe
 
     return heat_level
 
-#PD controller to modulate humidifier feedback
+#PD controller to modulate dehumidifier feedback
 def dehum_pd(humidity, target_humidity, last_humidity, last_target_humidity, P_hum, D_hum): #no dependencies
     err_humidity = target_humidity-humidity
 
@@ -530,7 +530,7 @@ def clean_up_processes():
         heat_process.terminate()
         heat_process.wait()
 
-    if (feature_toggles["humidifier"] == "1") and (dehumidify_process != None):
+    if (feature_toggles["dehumidifier"] == "1") and (dehumidify_process != None):
         dehumidify_process.terminate()
         dehumidify_process.wait()
 
@@ -608,7 +608,7 @@ def main_loop():
                                                                                                                                   last_target_temperature,
                                                                                                                                   int(hive_params["P_temp"]),
                                                                                                                                   int(hive_params["D_temp"]))))
-            if feature_toggles["humidifier"] == "1":
+            if feature_toggles["dehumidifier"] == "1":
                 print("Target Humidity: %.1f %% | Current: %.1f %% | Hum_PID: %s %%"%(int(hive_params["target_humidity"]), humidity, dehum_pd(humidity,
                                                                                                                                int(hive_params["target_humidity"]),
                                                                                                                                last_humidity,
