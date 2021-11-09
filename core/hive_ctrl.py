@@ -713,7 +713,7 @@ def main_loop():
             #update actuators in use
             if feature_toggles["heater"] == "1":
                 run_heat(str(heat_pd(temperature,int(hive_params["target_temperature"]),last_temperature,last_target_temperature,int(hive_params["P_temp"]),int(hive_params["D_temp"]))))
-            if feature_toggles["humidifier"] == "1":
+            if feature_toggles["dehumidifier"] == "1":
                 run_hum(str(dehum_pd(humidity,int(hive_params["target_humidity"]),last_humidity,last_target_humidity,int(hive_params["P_hum"]),int(hive_params["D_hum"]))))
             if feature_toggles["camera"] == "1":
                 run_camera(int(hive_params["camera_interval"]))

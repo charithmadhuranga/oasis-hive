@@ -674,7 +674,7 @@ def setup_hivectrl_process(): #Depends on: load_state(), write_state(), 'subproc
         else: #if not connected
             write_state("/home/pi/oasis-hive/configs/device_state.json","led_status","offline_running")
 
-        print("launched grow controller")
+        print("Launched Hive controller")
 
     else:
 
@@ -687,7 +687,7 @@ def setup_hivectrl_process(): #Depends on: load_state(), write_state(), 'subproc
         else: #if not connected
             write_state('/home/pi/oasis-hive/configs/device_state.json',"led_status","offline_idle")
 
-        print("grow controller not launched")
+        print("Hive controller not launched")
 
 #checks in the the core process has been called from the command line
 def cmd_line_args():
@@ -713,7 +713,7 @@ def check_hivectrl_running(): #Depends on: load_state(), write_state(), 'subproc
         if poll_hive_ctrl is not None: #if it is not running
             #launch it
             hive_ctrl_process = Popen(["sudo", "python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "main"])
-            print("launched grow-ctrl")
+            print("launched hive-ctrl")
 
             if device_state["connected"] == "1": #if connected
                 #send LEDmode = "connected_running"
