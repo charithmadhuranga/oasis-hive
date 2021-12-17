@@ -518,7 +518,7 @@ def check_updates(): #depends on: load_state(),'subproceess', update.py; modifie
         write_state("/home/pi/oasis-hive/configs/device_state.json","connected","0") #make sure it doesn't write anything to the cloud, kill the listener
         listener = None
         #launch update.py and wait to complete
-        update_process = Popen(["sudo", "python3", "/home/pi/oasis-hive/utils/update.py"])
+        update_process = Popen(["python3", "/home/pi/oasis-hive/utils/update.py"])
         write_state("/home/pi/oasis-hive/configs/device_state.json","connected","1")#restore listener
         output, error = update_process.communicate()
         if update_process.returncode != 0:
@@ -666,7 +666,7 @@ def setup_hivectrl_process(): #Depends on: load_state(), write_state(), 'subproc
     if device_state["running"] == "1":
 
         #launch hive_ctrl main
-        hive_ctrl_process = Popen(["sudo", "python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "main"])
+        hive_ctrl_process = Popen(["python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "main"])
 
         if device_state["connected"] == "1": #if connected
             #LEDmode = "connected_running"
@@ -679,7 +679,7 @@ def setup_hivectrl_process(): #Depends on: load_state(), write_state(), 'subproc
     else:
 
         #launch sensing-feedback subprocess in daemon mode
-        hive_ctrl_process = Popen(["sudo", "python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "daemon"])
+        hive_ctrl_process = Popen(["python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "daemon"])
 
         if device_state["connected"] == "1": #if connected
             #LEDmode = "connected_idle"
@@ -712,7 +712,7 @@ def check_hivectrl_running(): #Depends on: load_state(), write_state(), 'subproc
         poll_hive_ctrl = hive_ctrl_process.poll() #check if hive_ctrl process is running
         if poll_hive_ctrl is not None: #if it is not running
             #launch it
-            hive_ctrl_process = Popen(["sudo", "python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "main"])
+            hive_ctrl_process = Popen(["python3", "/home/pi/oasis-hive/core/hive_ctrl.py", "main"])
             print("launched hive-ctrl")
 
             if device_state["connected"] == "1": #if connected

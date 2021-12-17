@@ -175,7 +175,7 @@ if __name__ == '__main__':
     print("Transfered compatible state & configs, removing temporary files")
 
     #run external update commands
-    update_commands = Popen(["sudo", "python3", "/home/pi/oasis-hive/utils/update_commands.py"])
+    update_commands = Popen(["python3", "/home/pi/oasis-hive/utils/update_commands.py"])
     output, error = update_commands.communicate()
 
     #load state to get configs & state for conn

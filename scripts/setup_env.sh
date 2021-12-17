@@ -21,13 +21,13 @@ source /home/pi/.bashrc
 
 echo "Installing pip3 & Python 3.7 modules..."
 sudo apt install python3-pip -y
+sudo apt-get install python3-venv -y
+python3 -m venv /home/pi/oasis-hive_venv
+source /home/pi/oasis-hive_venv/bin/activate
 python3 -m pip install -r /home/pi/oasis-hive/defaults/requirements.txt
 
 echo "Installing python 3.7 RPi.GPIO for OS..."
 sudo apt-get -y install python3-rpi.gpio
 
 echo "Installing python 3.7 OpenCV for OS..."
-sudo apt install python3-opencv
-
-echo "Installing streamlit to root so python can edit wpa_supplicant.conf.."
-sudo pip3 install streamlit==0.62.0
+sudo apt install python3-opencv -y
