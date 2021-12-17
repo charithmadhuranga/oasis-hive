@@ -9,10 +9,10 @@ source /home/pi/oasis-hive/scripts/setup_network.sh
 
 while getopts ":b" opt; do
     case $opt in
-        b)
-            echo "Adding controller bootloader..."
-            sudo chmod +x /home/pi/oasis-hive/scripts/setup_bootloader.sh
-            source /home/pi/oasis-hive/scripts/setup_bootloader.sh
+        rc_local)
+            echo "Adding rc.local bootloader..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/setup_rclocal.sh
+            source /home/pi/oasis-hive/scripts/setup_rclocal.sh
             
             echo "Optimizing boot time..."
             sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh

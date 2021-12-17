@@ -13,7 +13,7 @@ sudo apt-get install -y cmake
 echo "Activating NTP & setting local time to America/New_York"
 sudo apt-get install -y ntp
 sudo systemctl enable ntp
-sudo systemctl start npt
+sudo systemctl start ntp
 sudo timedatectl set-ntp true
 sudo timedatectl set-timezone America/New_York
 
