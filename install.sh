@@ -1,22 +1,22 @@
 #!/bin/sh -e
 
 sudo chmod +x /home/pi/oasis-hive/scripts/setup_env.sh
-source /home/pi/oasis-hive/scripts/setup_env.sh
+. /home/pi/oasis-hive/scripts/setup_env.sh
 sudo chmod +x /home/pi/oasis-hive/scripts/setup_config.sh
-source /home/pi/oasis-hive/scripts/setup_config.sh
+. /home/pi/oasis-hive/scripts/setup_config.sh
 sudo chmod +x /home/pi/oasis-hive/scripts/setup_network.sh
-source /home/pi/oasis-hive/scripts/setup_network.sh
+. /home/pi/oasis-hive/scripts/setup_network.sh
 
 while getopts ":b" opt; do
     case $opt in
         rc_local)
             echo "Adding rc.local bootloader..."
             sudo chmod +x /home/pi/oasis-hive/scripts/setup_rclocal.sh
-            source /home/pi/oasis-hive/scripts/setup_rclocal.sh
+            . /home/pi/oasis-hive/scripts/setup_rclocal.sh
             
             echo "Optimizing boot time..."
             sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
-            source /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
+            . /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
             
             ;;
         \?)

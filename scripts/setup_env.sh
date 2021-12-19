@@ -19,13 +19,13 @@ sudo timedatectl set-timezone America/New_York
 
 echo "Configuring PATH variable..."
 echo "export PATH=/home/pi/.local/bin:$PATH/" | sudo tee -a /home/pi/.bashrc
-source /home/pi/.bashrc
+. /home/pi/.bashrc
 
 echo "Installing pip3 & Python 3.7 modules..."
 sudo apt install python3-pip -y
 sudo apt-get install python3-venv -y
 python3 -m venv /home/pi/oasis-hive_venv
-source /home/pi/oasis-hive_venv/bin/activate
+. /home/pi/oasis-hive_venv/bin/activate
 python3 -m pip install -r /home/pi/oasis-hive/defaults/requirements.txt
 
 echo "Installing python 3.7 RPi.GPIO for OS..."
