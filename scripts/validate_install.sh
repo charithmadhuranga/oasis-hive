@@ -17,7 +17,7 @@ elif ! [ -d "/usr/lib/python3/dist-packages/setuptools" ]; then
     echo "'setuptools' not found"
 fi
 
-for packageName in Cython numpy pandas firebase pyrebase python_jwt gcloud sseclient requests_toolbelt pickle5 serial PIL; do
+for packageName in Cython firebase pyrebase python_jwt gcloud sseclient requests_toolbelt pickle5 serial PIL; do
     if ! [ -d "/home/pi/.local/lib/python3.7/site-packages/$packageName" ]; then
         echo "package '$packageName' not found"
     fi

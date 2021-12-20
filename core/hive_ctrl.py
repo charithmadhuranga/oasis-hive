@@ -27,7 +27,7 @@ import requests
 #data handling
 import json
 import csv
-import pandas
+from csv import writer
 
 #dealing with specific times of the day
 import time
@@ -413,11 +413,19 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
                 pass #continue the loop until write is successful or ceiling is hit
 
 #write some data to a .csv, takes a dictionary and a path
-def write_csv(path, dict): #Depends on: 'pandas',
-    #load dict into dataframe
-    df = pandas.DataFrame(dict)
-    #.csv write
-    df.to_csv(str(path), sep='\t', header=None, mode='a+')
+def write_csv(filename, dict): 
+    file_exists = os.path.isfile(filename)
+
+    with open (filename, 'a') as csvfile:
+        headers = ["time", "temperature", "humidity", "water_low"]
+        writer = csv.DictWriter(csvfile, delimiter=',', lineterminator='\n',fieldnames=headers)
+
+        if not file_exists:
+            writer.writeheader()  # file doesn't exist yet, write a header
+
+        writer.writerow(dict)
+    
+    return 
 
 #attempts connection to microcontroller
 def start_serial(): #Depends on:'serial'; Modifies: ser_out
@@ -622,73 +630,6 @@ def main_loop():
 
 
             print("------------------------------------------------------------")
-
-            #every hour, log past hour and shift 24 hours of sensor data
-            if time.time() - sensor_log_timer > 3600:
-
-                if feature_toggles["temp_hum_sensor"] == "1":
-
-                    print("Entering temp & hum logging")
-                    
-                    #replace each log with the next most recent one
-                    device_state["temperature_log"][23] = device_state["temperature_log"][22]
-                    device_state["temperature_log"][22] = device_state["temperature_log"][21]
-                    device_state["temperature_log"][21] = device_state["temperature_log"][20]
-                    device_state["temperature_log"][20] = device_state["temperature_log"][19]
-                    device_state["temperature_log"][19] = device_state["temperature_log"][18]
-                    device_state["temperature_log"][18] = device_state["temperature_log"][17]
-                    device_state["temperature_log"][17] = device_state["temperature_log"][16]
-                    device_state["temperature_log"][16] = device_state["temperature_log"][15]
-                    device_state["temperature_log"][15] = device_state["temperature_log"][14]
-                    device_state["temperature_log"][14] = device_state["temperature_log"][13]
-                    device_state["temperature_log"][13] = device_state["temperature_log"][12]
-                    device_state["temperature_log"][12] = device_state["temperature_log"][11]
-                    device_state["temperature_log"][11] = device_state["temperature_log"][10]
-                    device_state["temperature_log"][10] = device_state["temperature_log"][9]
-                    device_state["temperature_log"][9] = device_state["temperature_log"][8]
-                    device_state["temperature_log"][8] = device_state["temperature_log"][7]
-                    device_state["temperature_log"][7] = device_state["temperature_log"][6]
-                    device_state["temperature_log"][6] = device_state["temperature_log"][5]
-                    device_state["temperature_log"][5] = device_state["temperature_log"][4]
-                    device_state["temperature_log"][4] = device_state["temperature_log"][3]
-                    device_state["temperature_log"][3] = device_state["temperature_log"][2]
-                    device_state["temperature_log"][2] = device_state["temperature_log"][1]
-                    device_state["temperature_log"][1] = device_state["temperature_log"][0]
-                    
-                    device_state["humidity_log"][23] = device_state["humidity_log"][22]
-                    device_state["humidity_log"][22] = device_state["humidity_log"][21]
-                    device_state["humidity_log"][21] = device_state["humidity_log"][20]
-                    device_state["humidity_log"][20] = device_state["humidity_log"][19]
-                    device_state["humidity_log"][19] = device_state["humidity_log"][18]
-                    device_state["humidity_log"][18] = device_state["humidity_log"][17]
-                    device_state["humidity_log"][17] = device_state["humidity_log"][16]
-                    device_state["humidity_log"][16] = device_state["humidity_log"][15]
-                    device_state["humidity_log"][15] = device_state["humidity_log"][14]
-                    device_state["humidity_log"][14] = device_state["humidity_log"][13]
-                    device_state["humidity_log"][13] = device_state["humidity_log"][12]
-                    device_state["humidity_log"][12] = device_state["humidity_log"][11]
-                    device_state["humidity_log"][11] = device_state["humidity_log"][10]
-                    device_state["humidity_log"][10] = device_state["humidity_log"][9]
-                    device_state["humidity_log"][9] = device_state["humidity_log"][8]
-                    device_state["humidity_log"][8] = device_state["humidity_log"][7]
-                    device_state["humidity_log"][7] = device_state["humidity_log"][6]
-                    device_state["humidity_log"][6] = device_state["humidity_log"][5]
-                    device_state["humidity_log"][5] = device_state["humidity_log"][4]
-                    device_state["humidity_log"][4] = device_state["humidity_log"][3]
-                    device_state["humidity_log"][3] = device_state["humidity_log"][2]
-                    device_state["humidity_log"][2] = device_state["humidity_log"][1]
-                    device_state["humidity_log"][1] = device_state["humidity_log"][0]
-
-                    #save new data to 1 hour ago
-                    device_state["temperature_log"][0] = temperature
-                    device_state["humidity_log"][0] = humidity
-                    
-                    #push data to local json too
-                    write_state("/home/pi/oasis-hive/configs/device_state.json", "temperature_log", device_state["temperature_log"])
-                    write_state("/home/pi/oasis-hive/configs/device_state.json", "humidity_log", device_state["humidity_log"])
-                    
-                #start clock
-                sensor_log_timer = time.time()
 
             #write data and send to server after set time elapses
             if time.time() - data_timer > 300:

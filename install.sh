@@ -19,6 +19,16 @@ while getopts ":b" opt; do
             . /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
             
             ;;
+        systemd)
+            echo "Adding systemd service..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/setup_systemd.sh
+            . /home/pi/oasis-hive/scripts/setup_systemd.sh
+            
+            echo "Optimizing boot time..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
+            . /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
+            
+            ;;
         \?)
             echo "Invalid option: -$OPTARG"
             ;;

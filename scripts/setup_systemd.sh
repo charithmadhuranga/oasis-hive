@@ -12,6 +12,7 @@ ExecStart= /bin/bash /home/pi/oasis-hive/start.sh  #in this line specify the pat
 WantedBy=multi-user.target
 " | sudo tee /etc/systemd/system/oasis-hive.service
 
+sudo chmod +x /home/pi/oasis-hive/start.sh
 sudo systemctl enable oasis-hive
 sudo systemctl start oasis-hive
 sudo systemctl status oasis-hive
