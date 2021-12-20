@@ -6,7 +6,7 @@ printf "
 Description= Oasis-Hive startup script w/ permissions & virtualenv
 
 [Service]
-ExecStart= /home/pi/oasis-hive/scripts/start.sh  #in this line specify the path to the script.
+ExecStart= /bin/bash /home/pi/oasis-hive/start.sh  #in this line specify the path to the script.
 
 [Install]
 WantedBy=multi-user.target
