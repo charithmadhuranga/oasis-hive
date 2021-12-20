@@ -26,7 +26,7 @@ sudo apt install python3-pip -y
 sudo apt-get install python3-venv -y
 python3 -m venv /home/pi/oasis-hive_venv
 . /home/pi/oasis-hive_venv/bin/activate
-python3 -m pip install -r /home/pi/oasis-hive/defaults/requirements.txt
+/usr/bin/env python3 -m pip install -r /home/pi/oasis-hive/defaults/requirements.txt
 
 echo "Installing python 3.7 RPi.GPIO for OS..."
 sudo apt-get -y install python3-rpi.gpio
