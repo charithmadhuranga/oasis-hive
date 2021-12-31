@@ -2,4 +2,4 @@
 
 sudo chmod +w /etc/rc.local
 sudo sed -ie "/^fi/a . /home/pi/oasis-hive/start.sh &" /etc/rc.local
-sudo sed -ie "/^fi/a sudo chmod +x /home/pi/oasis-hive/start.sh" /etc/rc.local
+sudo sed -ie "/^fi/a chmod +x /home/pi/oasis-hive/start.sh" /etc/rc.local

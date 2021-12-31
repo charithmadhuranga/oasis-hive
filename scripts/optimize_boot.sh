@@ -4,19 +4,22 @@ echo "Disabling non-essential services at boot"
 sudo systemctl disable apt-daily.service
 sudo systemctl disable apt-daily-upgrade.service
 sudo systemctl disable man-db.service
+
 echo "Removed apt-daily, apt-daily-upgrade, & man-db"
 sudo systemctl disable dphys-swapfile.service
 sudo systemctl disable avahi-daemon.service
 sudo systemctl disable triggerhappy.service
 
-while getopts ":no_bt:no_wifi" opt; do
+echo "Removed dphys-swapfile, avahi-daemon, & triggerhappy"
+
+while getopts ":b:w:" opt; do
     case $opt in
-        no_bt)
+        b)
             echo "Disabling bluetooth services at boot..."
             sudo systemctl disable hciuart.service
             sudo systemctl disable bluetooth.service
             ;;
-        no_wifi)
+        w)
             echo "Disabling wifi services at boot..."
             sudo systemctl disable wifi-country.service
             sudo systemctl disable dhcpcd.service
