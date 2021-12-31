@@ -7,9 +7,9 @@ sudo chmod +x /home/pi/oasis-hive/scripts/setup_config.sh
 sudo chmod +x /home/pi/oasis-hive/scripts/setup_network.sh
 . /home/pi/oasis-hive/scripts/setup_network.sh
 
-while getopts ":b" opt; do
+while getopts ":rclocal:systemd" opt; do
     case $opt in
-        rc_local)
+        rclocal)
             echo "Adding rc.local bootloader..."
             sudo chmod +x /home/pi/oasis-hive/scripts/setup_rclocal.sh
             . /home/pi/oasis-hive/scripts/setup_rclocal.sh

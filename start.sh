@@ -11,4 +11,4 @@ sudo chmod +rwx /etc/dhcpcd_backup.conf
 sudo chmod +rwx /etc/dnsmasq.conf
 sudo chmod +rwx /etc/dnsmasq_backup.conf
 . /home/pi/oasis-hive_venv/bin/activate
-/usr/bin/env python3 /home/pi/oasis-hive/main.py &
+/usr/bin/env python3 /home/pi/oasis-hive/main.py
