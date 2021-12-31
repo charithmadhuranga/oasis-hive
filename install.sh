@@ -9,7 +9,7 @@ while getopts ":r:d" opt; do
             . /home/pi/oasis-hive/scripts/setup_rclocal.sh
             
             echo "Optimizing boot time..."
-            . /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
+            . /home/pi/oasis-hive/scripts/optimize_boot.sh -b        
             
             ;;
         d)
@@ -17,7 +17,7 @@ while getopts ":r:d" opt; do
             . /home/pi/oasis-hive/scripts/setup_systemd.sh
             
             echo "Optimizing boot time..."
-            . /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
+            . /home/pi/oasis-hive/scripts/optimize_boot.sh -b        
             
             ;;
         \?)
