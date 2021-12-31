@@ -1,22 +1,30 @@
 #!/bin/sh -e
 
-sudo chmod -R +x /home/pi/oasis-hive/scripts
+sudo chmod +x /home/pi/oasis-hive/scripts
 
-while getopts ":r:d" opt; do
+. /home/pi/oasis-hive/scripts/setup_env.sh
+. /home/pi/oasis-hive/scripts/setup_config.sh
+. /home/pi/oasis-hive/scripts/setup_network.sh
+
+while getopts ":r:d:" opt; do
     case $opt in
         r)
             echo "Adding rc.local bootloader..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/setup_rclocal.sh
             . /home/pi/oasis-hive/scripts/setup_rclocal.sh
             
             echo "Optimizing boot time..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
             . /home/pi/oasis-hive/scripts/optimize_boot.sh -b        
             
             ;;
-        d)
+        systemd)
             echo "Adding systemd service..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/setup_systemd.sh
             . /home/pi/oasis-hive/scripts/setup_systemd.sh
             
             echo "Optimizing boot time..."
+            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
             . /home/pi/oasis-hive/scripts/optimize_boot.sh -b        
             
             ;;
