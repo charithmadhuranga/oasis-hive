@@ -2,6 +2,7 @@ import sys
 import subprocess
 from subprocess import Popen
 import json
+import requests
 
 #set proper path for modules
 sys.path.append('/home/pi/oasis-hive')
@@ -11,6 +12,9 @@ sys.path.append('/usr/lib/python3.7/lib-dynload')
 sys.path.append('/home/pi/.local/lib/python3.7/site-packages')
 sys.path.append('/usr/local/lib/python3.7/dist-packages')
 sys.path.append('/usr/lib/python3/dist-packages')
+
+import main
+from core import hive_ctrl
 
 #declare process management variables
 ser_in = None
