@@ -625,7 +625,7 @@ def main_loop():
                                                                                                                                   int(hive_params["P_temp"]),
                                                                                                                                   int(hive_params["D_temp"]))))
             if feature_toggles["dehumidifier"] == "1":
-                print("Target Humidity: %.1f %% | Current: %.1f %% | Hum_PID: %s %%"%(int(hive_params["target_humidity"]), humidity, dehum_pd(humidity,
+                print("Target Humidity: %.1f %% | Current: %.1f %% | DeHum_PID: %s %%"%(int(hive_params["target_humidity"]), humidity, dehum_pd(humidity,
                                                                                                                                int(hive_params["target_humidity"]),
                                                                                                                                last_humidity,
                                                                                                                                last_target_humidity,
