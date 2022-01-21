@@ -105,7 +105,7 @@ def test_update():
     update.get_update_test()
 
 def test_install():
-    validator = Popen(["source", "/home/pi/oasis-hive/scripts/validate_install.sh"])
+    validator = Popen(["sudo", ".", "/home/pi/oasis-hive/scripts/validate_install.sh"])
     output, error = validator.communicate()
 
 def test_AP_up():
