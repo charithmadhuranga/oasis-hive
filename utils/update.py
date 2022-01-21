@@ -113,7 +113,7 @@ def write_state(path,field,value, loop_limit=100000): #Depends on: load_state(),
 
 #get latest code from designated repository
 def git_pull():
-    gitpull = Popen(["git", "pull", "origin", "master"])
+    gitpull = Popen(["git", "pull", "origin", "main"])
     gitpull.wait()
 
     print("Pulled most recent production repo")
@@ -157,11 +157,10 @@ def transfer_compatible_configs(config_path,temp_config_path):
         json.dump(config, x)
         x.truncate()
 
-    remove_temp = Popen(["sudo", "rm", temp_config_path])
+    remove_temp = Popen(["rm", temp_config_path])
     remove_temp.wait()
 
-if __name__ == '__main__':
-
+def get_update():
     #get latest code
     git_pull()
 
@@ -188,3 +187,34 @@ if __name__ == '__main__':
     print("Rebooting...")
     reboot = Popen(["sudo","systemctl","reboot"])
     reboot.wait()
+
+def get_update_test():
+    #get latest code
+    git_pull()
+
+    #back up the configs & state that can survive update
+    save_old_configs()
+    reset_model.reset_all()
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/hardware_config.json', '/home/pi/oasis-hive/configs/hardware_config_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/access_config.json', '/home/pi/oasis-hive/configs/access_config_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/device_state.json', '/home/pi/oasis-hive/configs/device_state_temp.json')
+    transfer_compatible_configs('/home/pi/oasis-hive/configs/hive_params.json', '/home/pi/oasis-hive/configs/hive_params_temp.json')
+    print("Transfered compatible state & configs, removing temporary files")
+
+    #run external update commands
+    update_commands = Popen(["python3", "/home/pi/oasis-hive/utils/update_commands.py"])
+    output, error = update_commands.communicate()
+
+    #load state to get configs & state for conn
+    load_state()
+
+    #change awaiting_update to "O" in firebase and locally
+    write_state("/home/pi/oasis-hive/configs/device_state.json", "awaiting_update", "0")
+
+    #reboot (not called during test)
+    #print("Rebooting...")
+    #reboot = Popen(["sudo","systemctl","reboot"])
+    #reboot.wait()
+
+if __name__ == '__main__':
+    get_update()

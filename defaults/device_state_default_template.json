@@ -1,5 +1,6 @@
 {
- "connected": "0",
+"device_type": "oasis-hive",
+"connected": "0",
  "running": "0",
  "led_status": "off",
  "access_point": "0",

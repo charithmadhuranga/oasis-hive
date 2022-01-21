@@ -482,15 +482,20 @@ def heat_pd(temperature, target_temperature, last_temperature, last_target_tempe
 
 #PD controller to modulate dehumidifier feedback
 def dehum_pd(humidity, target_humidity, last_humidity, last_target_humidity, P_hum, D_hum): #no dependencies
-    err_humidity = target_humidity-humidity
 
-    humidity_dot = humidity-last_humidity
+    err_humidity = humidity-target_humidity #If target is 60 and humidity is 30, this value is negative, little dehum
+                                            #If target is 30 and humidity is 60, this value = 30, more dehum
+ 
+    humidity_dot = humidity-last_humidity   #If hum increasing (+#), amplify the dehum signal
+                                            #If hum decreasing, (-#), dampen the dehum signal
 
-    target_humidity_dot = target_humidity-last_target_humidity
+    target_humidity_dot = target_humidity-last_target_humidity #When adjusting target down (-#), amplify dehum
+                                                               #When adjusting target up (+#), dampen dehum 
 
-    err_dot_humidity = target_humidity_dot-humidity_dot
+    err_dot_humidity = target_humidity_dot-humidity_dot #When this number is big, little dehum
+                                                        #When this number is small, more dehum
 
-    dehumidify_level  = P_hum*(0-err_humidity) + D_hum*(0-err_dot_humidity)
+    dehumidify_level  = P_hum*(err_humidity) + D_hum*(0-err_dot_humidity)
     dehumidify_level  = max(min(int(dehumidify_level),100),0)
 
     return dehumidify_level
@@ -639,7 +644,7 @@ def main_loop():
                     if feature_toggles["save_data"] == "1":
                         #save data to .csv
                         print("Writing to csv")
-                        write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv',{"time": [str(time.time())], "temperature": [str(temperature)], "humidity": [str(humidity)], "water_low": [str(water_low)]})
+                        write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv',{"time": [str(time.strftime('%l:%M%p %Z %b %d, %Y'))], "temperature": [str(temperature)], "humidity": [str(humidity)], "water_low": [str(water_low)]})
 
                     write_state("/home/pi/oasis-hive/configs/device_state.json", "temperature", str(temperature))
                     write_state("/home/pi/oasis-hive/configs/device_state.json", "humidity", str(humidity))

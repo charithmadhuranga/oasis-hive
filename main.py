@@ -582,7 +582,7 @@ def setup_button_AP(): #Depends on: load_state(), 'RPi.GPIO'; Modifies: connect_
     connect_internet_button = hardware_config["button_gpio_map"]["connect_internet_button"]
 
     #Setup buttons
-    GPIO.setup(connect_internet_button,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(connect_internet_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #gets the state of a button (returns 1 if not pressed, 0 if pressed)
 def get_button_state(button): #Depends on: RPi.GPIO; Modifies: None
@@ -623,32 +623,26 @@ def check_AP(): #Depends on: 'subprocess', oasis_server.py, setup_button_AP(); M
     load_state()
     if device_state["access_point"] == "1":
         #launch server subprocess to accept credentials over Oasis wifi network, does not wait
-        server_process = Popen(["sudo", "streamlit", "run", "/home/pi/oasis-hive/networking/oasis_setup.py", "--server.headless=true", "--server.port=80", "--server.address=192.168.4.1", "--server.enableCORS=false", "--server.enableWebsocketCompression=false"])
+        server_process = Popen(["streamlit", "run", "/home/pi/oasis-hive/networking/oasis_setup.py", "--server.headless=true", "--server.port=80", "--server.address=192.168.4.1", "--server.enableCORS=false", "--server.enableWebsocketCompression=false"])
         print("Access Point Mode enabled")
 
         setup_button_AP()
 
         if ser_out is not None:
-            #set led_status = "connectWifi"
             write_state("/home/pi/oasis-hive/configs/device_state.json","led_status","accepting_wifi_connection")
             load_state()
-            #write LED state to seriaL
             while True: #place the "exit button" here to leave connection mode
-                ser_out.write(bytes(str(device_state["led_status"]+"\n"), "utf-8"))
+                ser_out.write(bytes(str(device_state["led_status"]+"\n"), "utf-8")) #write LED state to seriaL
                 cbutton_state = get_button_state(connect_internet_button)
                 if cbutton_state == 0:
                     write_state("/home/pi/oasis-hive/configs/device_state.json","led_status","offline_idle")
                     ser_out.write(bytes(str(device_state["led_status"]+"\n"), "utf-8"))
-                    server_process.terminate()
-                    server_process.wait()
                     enable_WiFi()
                     time.sleep(1)
         else:
             while True:
                 cbutton_state = get_button_state(connect_internet_button)
                 if cbutton_state == 0:
-                    server_process.terminate()
-                    server_process.wait()
                     enable_WiFi()
                     time.sleep(1)
 
