@@ -105,7 +105,7 @@ def test_update():
     update.get_update_test()
 
 def test_install():
-    validator = Popen([".", "/home/pi/oasis-hive/scripts/validate_install.sh"])
+    validator = Popen(["source", "/home/pi/oasis-hive/scripts/validate_install.sh"])
     output, error = validator.communicate()
 
 def test_AP_up():
@@ -123,13 +123,13 @@ def test_all_components():
     test_reset_model()
     test_serial_connections()
     test_listen()
-    test_camera()
+    #test_camera()
     test_heater()
     test_dehumidifier()
     test_save_csv()
-    test_cloud_connection()
-    test_send_image()
-    test_update()
+    #test_cloud_connection()
+    #test_send_image()
+    #test_update()
     
 
 if __name__ == "__main__":
