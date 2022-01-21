@@ -46,7 +46,6 @@ camera_process = None
 #declare sensor data variables
 temperature = 0
 humidity = 0
-water_low = 0
 last_temperature = 0
 last_humidity = 0
 last_target_temperature = 0
@@ -417,7 +416,7 @@ def write_csv(filename, dict):
     file_exists = os.path.isfile(filename)
 
     with open (filename, 'a') as csvfile:
-        headers = ["time", "temperature", "humidity", "water_low"]
+        headers = ["time", "temperature", "humidity"]
         writer = csv.DictWriter(csvfile, delimiter=',', lineterminator='\n',fieldnames=headers)
 
         if not file_exists:
@@ -443,9 +442,9 @@ def start_serial(): #Depends on:'serial'; Modifies: ser_out
         print("Serial connection not found")
 
 #gets data from serial THIS WILL HAVE TO BE DEPRECATED SOON IN FAVOR OF AN ON-BOARD SENSOR SUITE
-def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_info, temperature, humidity, last_temperature, last_humidity, water_low
+def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_info, temperature, humidity, last_temperature, last_humidity
     #load in global vars
-    global ser_in,sensor_info,temperature,humidity,last_temperature,last_humidity,water_low
+    global ser_in,sensor_info,temperature,humidity,last_temperature,last_humidity
 
     if ser_in == None:
         return
@@ -462,8 +461,6 @@ def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_inf
 
         last_temperature = temperature
         temperature =float(sensor_info[1])
-
-        water_low = int(sensor_info[2])
 
 #PD controller to modulate heater feedback
 def heat_pd(temperature, target_temperature, last_temperature, last_target_temperature, P_heat, D_heat): #no dependencies
@@ -613,7 +610,7 @@ def main_loop():
             load_state() #regresh the state variables to get new parameters
 
 
-            if (feature_toggles["temp_hum_sensor"] == "1") or (feature_toggles["water_low_sensor"] == "1"):
+            if (feature_toggles["temp_hum_sensor"] == "1"):
                 try: #attempt to read data from sensor, raise exception if there is a problem
                     listen() #this will be changed to run many sensor functions as opposed to one serial listener
                 except Exception as e:
@@ -650,11 +647,10 @@ def main_loop():
                     if feature_toggles["save_data"] == "1":
                         #save data to .csv
                         print("Writing to csv")
-                        write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv',{"time": [str(time.strftime('%l:%M%p %Z %b %d, %Y'))], "temperature": [str(temperature)], "humidity": [str(humidity)], "water_low": [str(water_low)]})
+                        write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv',{"time": [str(time.strftime('%l:%M%p %Z %b %d, %Y'))], "temperature": [str(temperature)], "humidity": [str(humidity)]})
 
                     write_state("/home/pi/oasis-hive/configs/device_state.json", "temperature", str(temperature))
                     write_state("/home/pi/oasis-hive/configs/device_state.json", "humidity", str(humidity))
-                    write_state("/home/pi/oasis-hive/configs/device_state.json", "water_low", str(water_low))
 
                     data_timer = time.time()
 

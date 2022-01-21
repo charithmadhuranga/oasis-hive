@@ -54,33 +54,46 @@ def test_state_handlers():
     update.write_state("/home/pi/oasis-hive/configs/device_state.json", "running", str("1"))
     update.write_state("/home/pi/oasis-hive/configs/device_state.json", "running", str("0"))
 
+    print("All state handlers working.")
+
 def test_reset_model():
     reset_model.reset_device_state()
     reset_model.reset_hive_params()
     reset_model.reset_locks()
 
+    print("Most common reset-model functions operational")
+
 def test_serial_connections():
     main.start_serial()
+    print("Main serial is working")
+
     hive_ctrl.start_serial()
+    print("Core serial is working")
 
 def test_listen():
     hive_ctrl.listen()
+    print("Listening for data from Arduino")
+    print(str(hive_ctrl.temperature))
+    print(str(hive_ctrl.humidity))
 
 def test_camera():
     hive_ctrl.run_camera(0)
+    print("Is camera working?")
 
 def test_heater():
-    hive_ctrl.run_heat(10)
+    hive_ctrl.run_heat(20)
+    print("Is heater working?")
 
 def test_dehumidifier():
-    hive_ctrl.run_hum(10)
+    hive_ctrl.run_hum(50)
+    print("Is dehumidifier working?")
 
 def test_save_csv():
-    tod = str(time.strftime('%l:%M%p %Z %b %d, %Y'))
+    tod = str(time.strftime('%l:%M%p %Z, %b %d %Y'))
     temperature = str(70)
     humidity = str(50)
-    water_low = str(0)
-    hive_ctrl.write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv', {"time": tod, "temperature": temperature, "humidity": humidity, "water_low": water_low})
+    hive_ctrl.write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv', {"time": tod, "temperature": temperature, "humidity": humidity})
+    print("wrote data to csv")
 
 def test_cloud_connection():
     main.connect_firebase()
