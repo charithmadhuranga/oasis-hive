@@ -121,7 +121,7 @@ def test_AP_down():
     main.enable_WiFi()
 
 def test_all_components():
-    test_install()
+    #test_install()
     test_state_handlers()
     test_reset_model()
     test_serial_connections()
