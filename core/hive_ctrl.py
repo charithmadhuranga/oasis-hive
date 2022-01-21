@@ -467,36 +467,42 @@ def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_inf
 
 #PD controller to modulate heater feedback
 def heat_pd(temperature, target_temperature, last_temperature, last_target_temperature, P_heat, D_heat): #no dependencies
-    err_temperature = target_temperature-temperature
 
-    temperature_dot = temperature-last_temperature
+    err_temperature = target_temperature-temperature    #If target is 70 and temperature is 60, this value = 10, more heat
+                                                        #If target is 50 and temperature is 60, this value is negative, less heat
 
-    target_temperature_dot = target_temperature-last_target_temperature
+    temperature_dot = temperature-last_temperature  #If temp is increasing, this value is positive (+#)
+                                                    #If temp is decreasing, this value is negative (-#)
 
-    err_dot_temperature = target_temperature_dot-temperature_dot
+    target_temperature_dot = target_temperature-last_target_temperature #When target remains the same, this value is 0
+                                                                        #When adjusting target up, this value is positive (+#)
+                                                                        #When adjusting target down, this value is negative (-#)
 
-    heat_level  = P_heat*err_temperature + D_heat*err_dot_temperature
-    heat_level  = max(min(int(heat_level),100),0)
+    err_dot_temperature = target_temperature_dot-temperature_dot    #When positive, boosts heat signal
+                                                                    #When negative, dampens heat signal
+    heat_level  = P_heat * err_temperature + D_heat * err_dot_temperature
+    heat_level  = max(min(int(heat_level), 100), 0)
 
     return heat_level
 
 #PD controller to modulate dehumidifier feedback
 def dehum_pd(humidity, target_humidity, last_humidity, last_target_humidity, P_hum, D_hum): #no dependencies
 
-    err_humidity = humidity-target_humidity #If target is 60 and humidity is 30, this value is negative, little dehum
-                                            #If target is 30 and humidity is 60, this value = 30, more dehum
+    err_humidity = humidity - target_humidity   #If target is 60 and humidity is 30, this value is negative, less dehum
+                                                #If target is 30 and humidity is 60, this value = 30, more dehum
  
-    humidity_dot = humidity-last_humidity   #If hum increasing (+#), amplify the dehum signal
-                                            #If hum decreasing, (-#), dampen the dehum signal
+    humidity_dot = last_humidity - humidity #If hum increasing, this value is negative (-#)
+                                            #If hum decreasing, this value is positive (+#)
 
-    target_humidity_dot = target_humidity-last_target_humidity #When adjusting target down (-#), amplify dehum
-                                                               #When adjusting target up (+#), dampen dehum 
+    target_humidity_dot = last_target_humidity - target_humidity    #When target remains the same, this value is 0
+                                                                    #When adjusting target down, this value is positive (+#)
+                                                                    #When adjusting target up, this value is negative (-#)
 
-    err_dot_humidity = target_humidity_dot-humidity_dot #When this number is big, little dehum
-                                                        #When this number is small, more dehum
+    err_dot_humidity = humidity_dot - target_humidity_dot   #When positive, dampens dehum signal
+                                                            #When negative, boosts duhum signal
 
-    dehumidify_level  = P_hum*(err_humidity) + D_hum*(0-err_dot_humidity)
-    dehumidify_level  = max(min(int(dehumidify_level),100),0)
+    dehumidify_level  = P_hum * err_humidity + D_hum * (0 - err_dot_humidity)
+    dehumidify_level  = max(min(int(dehumidify_level), 100), 0)
 
     return dehumidify_level
 
