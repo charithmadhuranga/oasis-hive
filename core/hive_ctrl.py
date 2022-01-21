@@ -27,7 +27,7 @@ import requests
 #data handling
 import json
 import csv
-import pandas
+from csv import writer
 
 #dealing with specific times of the day
 import time
@@ -46,7 +46,6 @@ camera_process = None
 #declare sensor data variables
 temperature = 0
 humidity = 0
-water_low = 0
 last_temperature = 0
 last_humidity = 0
 last_target_temperature = 0
@@ -413,11 +412,19 @@ def write_state(path,field,value,loop_limit=100000): #Depends on: load_state(), 
                 pass #continue the loop until write is successful or ceiling is hit
 
 #write some data to a .csv, takes a dictionary and a path
-def write_csv(path, dict): #Depends on: 'pandas',
-    #load dict into dataframe
-    df = pandas.DataFrame(dict)
-    #.csv write
-    df.to_csv(str(path), sep='\t', header=None, mode='a+')
+def write_csv(filename, dict): 
+    file_exists = os.path.isfile(filename)
+
+    with open (filename, 'a') as csvfile:
+        headers = ["time", "temperature", "humidity"]
+        writer = csv.DictWriter(csvfile, delimiter=',', lineterminator='\n',fieldnames=headers)
+
+        if not file_exists:
+            writer.writeheader()  # file doesn't exist yet, write a header
+
+        writer.writerow(dict)
+    
+    return 
 
 #attempts connection to microcontroller
 def start_serial(): #Depends on:'serial'; Modifies: ser_out
@@ -435,9 +442,9 @@ def start_serial(): #Depends on:'serial'; Modifies: ser_out
         print("Serial connection not found")
 
 #gets data from serial THIS WILL HAVE TO BE DEPRECATED SOON IN FAVOR OF AN ON-BOARD SENSOR SUITE
-def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_info, temperature, humidity, last_temperature, last_humidity, water_low
+def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_info, temperature, humidity, last_temperature, last_humidity
     #load in global vars
-    global ser_in,sensor_info,temperature,humidity,last_temperature,last_humidity,water_low
+    global ser_in,sensor_info,temperature,humidity,last_temperature,last_humidity
 
     if ser_in == None:
         return
@@ -445,7 +452,7 @@ def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_inf
     #listen for data from aurdino
     sensor_info = ser_in.readline().decode('UTF-8').strip().split(' ')
 
-    if len(sensor_info)<3:
+    if len(sensor_info)<2:
         pass
     else:
         #print and save our data
@@ -455,35 +462,44 @@ def listen(): #Depends on 'serial', start_serial(); Modifies: ser_in, sensor_inf
         last_temperature = temperature
         temperature =float(sensor_info[1])
 
-        water_low = int(sensor_info[2])
-
 #PD controller to modulate heater feedback
 def heat_pd(temperature, target_temperature, last_temperature, last_target_temperature, P_heat, D_heat): #no dependencies
-    err_temperature = target_temperature-temperature
 
-    temperature_dot = temperature-last_temperature
+    err_temperature = target_temperature-temperature    #If target is 70 and temperature is 60, this value = 10, more heat
+                                                        #If target is 50 and temperature is 60, this value is negative, less heat
 
-    target_temperature_dot = target_temperature-last_target_temperature
+    temperature_dot = temperature-last_temperature  #If temp is increasing, this value is positive (+#)
+                                                    #If temp is decreasing, this value is negative (-#)
 
-    err_dot_temperature = target_temperature_dot-temperature_dot
+    target_temperature_dot = target_temperature-last_target_temperature #When target remains the same, this value is 0
+                                                                        #When adjusting target up, this value is positive (+#)
+                                                                        #When adjusting target down, this value is negative (-#)
 
-    heat_level  = P_heat*err_temperature + D_heat*err_dot_temperature
-    heat_level  = max(min(int(heat_level),100),0)
+    err_dot_temperature = target_temperature_dot-temperature_dot    #When positive, boosts heat signal
+                                                                    #When negative, dampens heat signal
+    heat_level  = P_heat * err_temperature + D_heat * err_dot_temperature
+    heat_level  = max(min(int(heat_level), 100), 0)
 
     return heat_level
 
 #PD controller to modulate dehumidifier feedback
 def dehum_pd(humidity, target_humidity, last_humidity, last_target_humidity, P_hum, D_hum): #no dependencies
-    err_humidity = target_humidity-humidity
 
-    humidity_dot = humidity-last_humidity
+    err_humidity = humidity - target_humidity   #If target is 60 and humidity is 30, this value is negative, less dehum
+                                                #If target is 30 and humidity is 60, this value = 30, more dehum
+ 
+    humidity_dot = last_humidity - humidity #If hum increasing, this value is negative (-#)
+                                            #If hum decreasing, this value is positive (+#)
 
-    target_humidity_dot = target_humidity-last_target_humidity
+    target_humidity_dot = last_target_humidity - target_humidity    #When target remains the same, this value is 0
+                                                                    #When adjusting target down, this value is positive (+#)
+                                                                    #When adjusting target up, this value is negative (-#)
 
-    err_dot_humidity = target_humidity_dot-humidity_dot
+    err_dot_humidity = humidity_dot - target_humidity_dot   #When positive, dampens dehum signal
+                                                            #When negative, boosts duhum signal
 
-    dehumidify_level  = P_hum*(0-err_humidity) + D_hum*(0-err_dot_humidity)
-    dehumidify_level  = max(min(int(dehumidify_level),100),0)
+    dehumidify_level  = P_hum * err_humidity + D_hum * (0 - err_dot_humidity)
+    dehumidify_level  = max(min(int(dehumidify_level), 100), 0)
 
     return dehumidify_level
 
@@ -594,7 +610,7 @@ def main_loop():
             load_state() #regresh the state variables to get new parameters
 
 
-            if (feature_toggles["temp_hum_sensor"] == "1") or (feature_toggles["water_low_sensor"] == "1"):
+            if (feature_toggles["temp_hum_sensor"] == "1"):
                 try: #attempt to read data from sensor, raise exception if there is a problem
                     listen() #this will be changed to run many sensor functions as opposed to one serial listener
                 except Exception as e:
@@ -609,7 +625,7 @@ def main_loop():
                                                                                                                                   int(hive_params["P_temp"]),
                                                                                                                                   int(hive_params["D_temp"]))))
             if feature_toggles["dehumidifier"] == "1":
-                print("Target Humidity: %.1f %% | Current: %.1f %% | Hum_PID: %s %%"%(int(hive_params["target_humidity"]), humidity, dehum_pd(humidity,
+                print("Target Humidity: %.1f %% | Current: %.1f %% | DeHum_PID: %s %%"%(int(hive_params["target_humidity"]), humidity, dehum_pd(humidity,
                                                                                                                                int(hive_params["target_humidity"]),
                                                                                                                                last_humidity,
                                                                                                                                last_target_humidity,
@@ -623,73 +639,6 @@ def main_loop():
 
             print("------------------------------------------------------------")
 
-            #every hour, log past hour and shift 24 hours of sensor data
-            if time.time() - sensor_log_timer > 3600:
-
-                if feature_toggles["temp_hum_sensor"] == "1":
-
-                    print("Entering temp & hum logging")
-                    
-                    #replace each log with the next most recent one
-                    device_state["temperature_log"][23] = device_state["temperature_log"][22]
-                    device_state["temperature_log"][22] = device_state["temperature_log"][21]
-                    device_state["temperature_log"][21] = device_state["temperature_log"][20]
-                    device_state["temperature_log"][20] = device_state["temperature_log"][19]
-                    device_state["temperature_log"][19] = device_state["temperature_log"][18]
-                    device_state["temperature_log"][18] = device_state["temperature_log"][17]
-                    device_state["temperature_log"][17] = device_state["temperature_log"][16]
-                    device_state["temperature_log"][16] = device_state["temperature_log"][15]
-                    device_state["temperature_log"][15] = device_state["temperature_log"][14]
-                    device_state["temperature_log"][14] = device_state["temperature_log"][13]
-                    device_state["temperature_log"][13] = device_state["temperature_log"][12]
-                    device_state["temperature_log"][12] = device_state["temperature_log"][11]
-                    device_state["temperature_log"][11] = device_state["temperature_log"][10]
-                    device_state["temperature_log"][10] = device_state["temperature_log"][9]
-                    device_state["temperature_log"][9] = device_state["temperature_log"][8]
-                    device_state["temperature_log"][8] = device_state["temperature_log"][7]
-                    device_state["temperature_log"][7] = device_state["temperature_log"][6]
-                    device_state["temperature_log"][6] = device_state["temperature_log"][5]
-                    device_state["temperature_log"][5] = device_state["temperature_log"][4]
-                    device_state["temperature_log"][4] = device_state["temperature_log"][3]
-                    device_state["temperature_log"][3] = device_state["temperature_log"][2]
-                    device_state["temperature_log"][2] = device_state["temperature_log"][1]
-                    device_state["temperature_log"][1] = device_state["temperature_log"][0]
-                    
-                    device_state["humidity_log"][23] = device_state["humidity_log"][22]
-                    device_state["humidity_log"][22] = device_state["humidity_log"][21]
-                    device_state["humidity_log"][21] = device_state["humidity_log"][20]
-                    device_state["humidity_log"][20] = device_state["humidity_log"][19]
-                    device_state["humidity_log"][19] = device_state["humidity_log"][18]
-                    device_state["humidity_log"][18] = device_state["humidity_log"][17]
-                    device_state["humidity_log"][17] = device_state["humidity_log"][16]
-                    device_state["humidity_log"][16] = device_state["humidity_log"][15]
-                    device_state["humidity_log"][15] = device_state["humidity_log"][14]
-                    device_state["humidity_log"][14] = device_state["humidity_log"][13]
-                    device_state["humidity_log"][13] = device_state["humidity_log"][12]
-                    device_state["humidity_log"][12] = device_state["humidity_log"][11]
-                    device_state["humidity_log"][11] = device_state["humidity_log"][10]
-                    device_state["humidity_log"][10] = device_state["humidity_log"][9]
-                    device_state["humidity_log"][9] = device_state["humidity_log"][8]
-                    device_state["humidity_log"][8] = device_state["humidity_log"][7]
-                    device_state["humidity_log"][7] = device_state["humidity_log"][6]
-                    device_state["humidity_log"][6] = device_state["humidity_log"][5]
-                    device_state["humidity_log"][5] = device_state["humidity_log"][4]
-                    device_state["humidity_log"][4] = device_state["humidity_log"][3]
-                    device_state["humidity_log"][3] = device_state["humidity_log"][2]
-                    device_state["humidity_log"][2] = device_state["humidity_log"][1]
-                    device_state["humidity_log"][1] = device_state["humidity_log"][0]
-
-                    #save new data to 1 hour ago
-                    device_state["temperature_log"][0] = temperature
-                    device_state["humidity_log"][0] = humidity
-                    
-                    #push data to local json too
-                    write_state("/home/pi/oasis-hive/configs/device_state.json", "temperature_log", device_state["temperature_log"])
-                    write_state("/home/pi/oasis-hive/configs/device_state.json", "humidity_log", device_state["humidity_log"])
-                    
-                #start clock
-                sensor_log_timer = time.time()
-
             #write data and send to server after set time elapses
             if time.time() - data_timer > 300:
 
@@ -698,11 +647,10 @@ def main_loop():
                     if feature_toggles["save_data"] == "1":
                         #save data to .csv
                         print("Writing to csv")
-                        write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv',{"time": [str(time.time())], "temperature": [str(temperature)], "humidity": [str(humidity)], "water_low": [str(water_low)]})
+                        write_csv('/home/pi/oasis-hive/data_out/sensor_feed/sensor_data.csv',{"time": [str(time.strftime('%l:%M%p %Z %b %d, %Y'))], "temperature": [str(temperature)], "humidity": [str(humidity)]})
 
                     write_state("/home/pi/oasis-hive/configs/device_state.json", "temperature", str(temperature))
                     write_state("/home/pi/oasis-hive/configs/device_state.json", "humidity", str(humidity))
-                    write_state("/home/pi/oasis-hive/configs/device_state.json", "water_low", str(water_low))
 
                     data_timer = time.time()
 

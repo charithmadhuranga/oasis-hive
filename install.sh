@@ -1,29 +1,38 @@
 #!/bin/sh -e
 
-sudo chmod +x /home/pi/oasis-hive/scripts/setup_env.sh
-source /home/pi/oasis-hive/scripts/setup_env.sh
-sudo chmod +x /home/pi/oasis-hive/scripts/setup_config.sh
-source /home/pi/oasis-hive/scripts/setup_config.sh
-sudo chmod +x /home/pi/oasis-hive/scripts/setup_network.sh
-source /home/pi/oasis-hive/scripts/setup_network.sh
+sudo chmod +x /home/pi/oasis-hive/scripts
 
-while getopts ":b" opt; do
-    case $opt in
-        b)
-            echo "Adding controller bootloader..."
-            sudo chmod +x /home/pi/oasis-hive/scripts/setup_bootloader.sh
-            source /home/pi/oasis-hive/scripts/setup_bootloader.sh
-            
-            echo "Optimizing boot time..."
-            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
-            source /home/pi/oasis-hive/scripts/optimize_boot.sh -no_bt        
-            
-            ;;
-        \?)
-            echo "Invalid option: -$OPTARG"
-            ;;
-    esac
-done
+. /home/pi/oasis-hive/scripts/setup_env.sh
+. /home/pi/oasis-hive/scripts/setup_config.sh
+. /home/pi/oasis-hive/scripts/setup_network.sh
+
+#while getopts ":r:d:" opt; do
+#    case $opt in
+#        r)
+#            echo "Adding rc.local bootloader..."
+#            sudo chmod +x /home/pi/oasis-hive/scripts/setup_rclocal.sh
+#            . /home/pi/oasis-hive/scripts/setup_rclocal.sh
+#            
+#            echo "Optimizing boot time..."
+#            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
+#            . /home/pi/oasis-hive/scripts/optimize_boot.sh -b        
+#            
+#            ;;
+#        systemd)
+#            echo "Adding systemd service..."
+#            sudo chmod +x /home/pi/oasis-hive/scripts/setup_systemd.sh
+#            . /home/pi/oasis-hive/scripts/setup_systemd.sh
+#            
+#            echo "Optimizing boot time..."
+#            sudo chmod +x /home/pi/oasis-hive/scripts/optimize_boot.sh
+#            . /home/pi/oasis-hive/scripts/optimize_boot.sh -b        
+#            
+#            ;;
+#        \?)
+#            echo "Invalid option: -$OPTARG"
+#            ;;
+#    esac
+#done
 
 echo "Returning to WiFi mode..."
 sudo cp /etc/dhcpcd_WiFi.conf /etc/dhcpcd.conf
